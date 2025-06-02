@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.karacam.stock_service.gen";
+
+import "google/protobuf/timestamp.proto";
+
+enum OrderSide {
+  BUY = 0;
+  SELL = 1;
+}
+
+enum OrderType {
+  LIMIT = 0;
+  MARKET = 1;
+}
+
+message OrderMessage {
+  uint32 user_id = 1;
+  string symbol = 2;
+  OrderSide side = 3;
+  OrderType type = 4;
+  uint32 quantity = 5;
+  optional double price = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
