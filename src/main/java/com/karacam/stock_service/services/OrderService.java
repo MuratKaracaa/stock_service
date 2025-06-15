@@ -43,7 +43,6 @@ public class OrderService {
         String orderId = generateHashForIncomingOrder(order);
         Instant timeStamp = TimeUtil.protoTimestampToInstant(order.getTimestamp());
 
-
         if (this.redisService.checkAndSet(orderSetKey, orderId)) {
             IncomingStockOrder incomingStockOrder = IncomingStockOrder.builder()
                     .orderId(orderId)
@@ -72,6 +71,7 @@ public class OrderService {
             outboxStockOrderRepository.save(outboxStockOrder);
         }
     }
+
 
     private String generateHashForIncomingOrder(IncomingOrder.OrderMessage order) {
         try {
