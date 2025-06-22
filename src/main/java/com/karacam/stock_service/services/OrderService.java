@@ -47,7 +47,7 @@ public class OrderService {
             IncomingStockOrder incomingStockOrder = IncomingStockOrder.builder()
                     .orderId(orderId)
                     .userId(order.getUserId())
-                    .symbol(order.getSymbol())
+                    .orderSymbol(order.getSymbol())
                     .price(order.getPrice())
                     .quantity(order.getQuantity())
                     .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
@@ -89,9 +89,9 @@ public class OrderService {
             throw new RuntimeException("Failed to generate hash for message", e);
         }
     }
-
+    
     @Scheduled(cron = "0 0 3 * * *")
-    private void updateOrderSetKey() {
+    protected void updateOrderSetKey() {
         orderSetKey = orderSetKeyPrefix.concat(TimeUtil.getToday());
     }
 }

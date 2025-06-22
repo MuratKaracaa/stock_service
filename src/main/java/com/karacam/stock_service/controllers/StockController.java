@@ -4,6 +4,8 @@ import com.karacam.stock_service.core.ValidationMessages;
 import com.karacam.stock_service.core.ValidationPatterns;
 import com.karacam.stock_service.dtos.responses.GetMultipleStocksResponse;
 import com.karacam.stock_service.dtos.responses.GetOneStockResponse;
+import com.karacam.stock_service.dtos.responses.GetTimeSeriesResponse;
+import com.karacam.stock_service.models.TimeSeriesPeriods;
 import com.karacam.stock_service.services.StockService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -48,4 +50,16 @@ public class StockController {
         return this.stockService.getMultipleStocks(symbols);
     }
 
+    @GetMapping("/get-time-series")
+    public GetTimeSeriesResponse getTimeSeries(
+            @RequestParam
+            @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
+            @NotBlank(message = ValidationMessages.PARAMETER_NOT_EMPTY)
+            String symbol,
+            @RequestParam
+            @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
+            TimeSeriesPeriods period
+    ) {
+        return this.stockService.getTimeSeries(symbol, period);
+    }
 }

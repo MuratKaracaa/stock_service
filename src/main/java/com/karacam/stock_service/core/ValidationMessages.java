@@ -11,4 +11,6 @@ public class ValidationMessages {
     public static final String SYMBOLS_REQUIRED = "symbols parameter must be provided";
     public static final String SYMBOLS_MAX_TWENTY = "Up to 20 symbols are allowed";
     public static final String SYMBOL_INVALID_FORMAT = "Invalid format. Symbols must be alphabetic and maximum 5 letters long.";
+
+    public static final String PERIOD_REQUIRED = "period parameter must be provided";
 }

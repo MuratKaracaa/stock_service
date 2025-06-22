@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -24,7 +25,7 @@ public class Stock {
     private String stockName;
 
     @Column(name = "latest_trading_price", nullable = false, precision = 10, scale = 2)
-    private double latestTradingPrice;
+    private BigDecimal latestTradingPrice;
 
     @Column(name = "latest_trading_price_time_stamp", nullable = false)
     private Instant latestTradingPriceTimeStamp;

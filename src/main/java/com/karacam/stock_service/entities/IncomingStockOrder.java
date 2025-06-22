@@ -28,8 +28,8 @@ public class IncomingStockOrder {
     @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "symbol")
-    private String symbol;
+    @Column(name = "order_symbol")
+    private String orderSymbol;
 
     @Column(name = "side")
     private OrderSide side;
@@ -53,6 +53,6 @@ public class IncomingStockOrder {
     private Instant timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "symbol", referencedColumnName = "symbol")
+    @JoinColumn(name = "order_symbol", referencedColumnName = "symbol", insertable = false, updatable = false)
     private Stock stock;
 }
