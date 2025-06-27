@@ -1,4 +1,4 @@
-package com.karacam.stock_service.core;
+package com.karacam.stock_service.constants;
 
 public class ValidationPatterns {
     private ValidationPatterns() {

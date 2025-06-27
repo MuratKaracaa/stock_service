@@ -1,4 +1,4 @@
-package com.karacam.stock_service.core.config;
+package com.karacam.stock_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

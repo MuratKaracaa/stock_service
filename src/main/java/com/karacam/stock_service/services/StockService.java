@@ -1,12 +1,9 @@
 package com.karacam.stock_service.services;
 
-import com.karacam.stock_service.dtos.responses.GetMultipleStocksResponse;
-import com.karacam.stock_service.dtos.responses.GetOneStockResponse;
-import com.karacam.stock_service.dtos.responses.GetTimeSeriesResponse;
 import com.karacam.stock_service.entities.Stock;
-import com.karacam.stock_service.models.OHLC;
-import com.karacam.stock_service.models.StockModel;
-import com.karacam.stock_service.models.TimeSeriesPeriods;
+import com.karacam.stock_service.enums.TimeSeriesPeriods;
+import com.karacam.stock_service.models.OHLCInfo;
+import com.karacam.stock_service.models.StockInfo;
 import com.karacam.stock_service.models.TimeSeriesPoint;
 import com.karacam.stock_service.repositories.StockRepository;
 import com.karacam.stock_service.utils.TimeUtil;
@@ -31,7 +28,7 @@ public class StockService {
         this.redisService = redisService_;
     }
 
-    public GetOneStockResponse getOneStock(String symbol) {
+    public StockInfo getOneStock(String symbol) {
         Optional<Stock> optionalStock = this.stockRepository.findById(symbol);
 
         if (optionalStock.isEmpty()) {
@@ -40,33 +37,29 @@ public class StockService {
 
         Stock stock = optionalStock.get();
 
-        return GetOneStockResponse.builder()
+        return StockInfo.builder()
                 .symbol(stock.getSymbol())
                 .stockName(stock.getStockName())
                 .latestTradingPrice(stock.getLatestTradingPrice())
                 .build();
     }
 
-    public GetMultipleStocksResponse getMultipleStocks(List<String> symbolList) {
+    public List<StockInfo> getMultipleStocks(List<String> symbolList) {
         List<Stock> stockList = this.stockRepository.findAllById(symbolList);
 
-        List<StockModel> stockDTOS = stockList.stream().map((iteratedStock) -> StockModel.builder()
+        return stockList.stream().map((iteratedStock) -> StockInfo.builder()
                 .symbol(iteratedStock.getSymbol())
                 .stockName(iteratedStock.getStockName())
                 .latestTradingPrice(iteratedStock.getLatestTradingPrice())
                 .build()).collect(Collectors.toList());
-
-        return GetMultipleStocksResponse.builder()
-                .stocks(stockDTOS)
-                .build();
     }
 
-    public GetTimeSeriesResponse getTimeSeries(String symbol, TimeSeriesPeriods period) {
+    public List<OHLCInfo> getOHLCInfo(String symbol, TimeSeriesPeriods period) {
         List<List<List<Number>>> queryResult = this.redisService.getTimeSeriesDataForStock(symbol, period);
         int dataLength = queryResult.getFirst().size();
-        List<OHLC> ohlcData = new ArrayList<>();
+        List<OHLCInfo> ohlcData = new ArrayList<>();
         for (int i = 0; i < dataLength; i++) {
-            OHLC ohlc = new OHLC();
+            OHLCInfo ohlc = new OHLCInfo();
             for (int j = 0; j < 4; j++) {
                 List<Number> pair = queryResult.get(j).get(i);
                 if (pair != null) {
@@ -87,9 +80,6 @@ public class StockService {
             }
             ohlcData.add(ohlc);
         }
-        return GetTimeSeriesResponse.builder()
-                .ohlcData(ohlcData)
-                .build();
+        return ohlcData;
     }
-
 }

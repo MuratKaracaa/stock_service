@@ -2,10 +2,10 @@ package com.karacam.stock_service.services;
 
 import com.karacam.stock_service.entities.IncomingStockOrder;
 import com.karacam.stock_service.entities.OutboxStockOrder;
+import com.karacam.stock_service.enums.OrderSide;
+import com.karacam.stock_service.enums.OrderStatus;
+import com.karacam.stock_service.enums.OrderType;
 import com.karacam.stock_service.gen.IncomingOrder;
-import com.karacam.stock_service.models.OrderSide;
-import com.karacam.stock_service.models.OrderStatus;
-import com.karacam.stock_service.models.OrderType;
 import com.karacam.stock_service.repositories.IncomingStockOrderRepository;
 import com.karacam.stock_service.repositories.OutboxStockOrderRepository;
 import com.karacam.stock_service.utils.TimeUtil;
@@ -89,7 +89,7 @@ public class OrderService {
             throw new RuntimeException("Failed to generate hash for message", e);
         }
     }
-    
+
     @Scheduled(cron = "0 0 3 * * *")
     protected void updateOrderSetKey() {
         orderSetKey = orderSetKeyPrefix.concat(TimeUtil.getToday());

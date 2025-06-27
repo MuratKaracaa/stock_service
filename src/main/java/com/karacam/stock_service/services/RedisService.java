@@ -1,6 +1,6 @@
 package com.karacam.stock_service.services;
 
-import com.karacam.stock_service.models.TimeSeriesPeriods;
+import com.karacam.stock_service.enums.TimeSeriesPeriods;
 import com.karacam.stock_service.utils.TimeUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;

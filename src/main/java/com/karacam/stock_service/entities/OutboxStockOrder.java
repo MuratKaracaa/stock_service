@@ -1,7 +1,7 @@
 package com.karacam.stock_service.entities;
 
-import com.karacam.stock_service.models.OrderSide;
-import com.karacam.stock_service.models.OrderType;
+import com.karacam.stock_service.enums.OrderSide;
+import com.karacam.stock_service.enums.OrderType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

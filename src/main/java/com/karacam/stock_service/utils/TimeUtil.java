@@ -1,7 +1,7 @@
 package com.karacam.stock_service.utils;
 
 import com.google.protobuf.Timestamp;
-import com.karacam.stock_service.models.TimeSeriesPeriods;
+import com.karacam.stock_service.enums.TimeSeriesPeriods;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +35,7 @@ public class TimeUtil {
         if (WEEK_END_DAYS.contains(baseDate.getDayOfWeek())) {
             baseDate = baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));
         }
-        
+
         LocalDate date = switch (period) {
             case TimeSeriesPeriods.DAILY -> baseDate;
             case TimeSeriesPeriods.WEEKLY -> baseDate.minusWeeks(1);

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OHLC {
+public class OHLCInfo {
     TimeSeriesPoint open;
     TimeSeriesPoint high;
     TimeSeriesPoint low;

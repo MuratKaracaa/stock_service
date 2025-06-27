@@ -1,4 +1,4 @@
-package com.karacam.stock_service.models;
+package com.karacam.stock_service.enums;
 
 public enum OrderType {
     LIMIT('1'),
@@ -10,7 +10,7 @@ public enum OrderType {
         this.value = c;
     }
 
-    public char getValue(){
+    public char getValue() {
         return this.value;
     }
 }

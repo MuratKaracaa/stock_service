@@ -1,4 +1,4 @@
-package com.karacam.stock_service.models;
+package com.karacam.stock_service.enums;
 
 public enum OrderStatus {
     NEW('1'),

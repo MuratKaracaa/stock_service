@@ -1,13 +1,13 @@
 package com.karacam.stock_service.models;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 @Data
-@SuperBuilder
-public class StockModel {
+@Builder
+public class StockInfo {
     private String symbol;
     private String stockName;
     private BigDecimal latestTradingPrice;

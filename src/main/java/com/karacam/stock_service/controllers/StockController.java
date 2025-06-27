@@ -1,11 +1,13 @@
 package com.karacam.stock_service.controllers;
 
-import com.karacam.stock_service.core.ValidationMessages;
-import com.karacam.stock_service.core.ValidationPatterns;
-import com.karacam.stock_service.dtos.responses.GetMultipleStocksResponse;
-import com.karacam.stock_service.dtos.responses.GetOneStockResponse;
-import com.karacam.stock_service.dtos.responses.GetTimeSeriesResponse;
-import com.karacam.stock_service.models.TimeSeriesPeriods;
+import com.karacam.stock_service.constants.ValidationMessages;
+import com.karacam.stock_service.constants.ValidationPatterns;
+import com.karacam.stock_service.dtos.GetMultipleStocksResponse;
+import com.karacam.stock_service.dtos.GetOneStockResponse;
+import com.karacam.stock_service.dtos.GetTimeSeriesResponse;
+import com.karacam.stock_service.enums.TimeSeriesPeriods;
+import com.karacam.stock_service.models.OHLCInfo;
+import com.karacam.stock_service.models.StockInfo;
 import com.karacam.stock_service.services.StockService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -35,7 +37,10 @@ public class StockController {
             @NotBlank(message = ValidationMessages.PARAMETER_NOT_EMPTY)
             String symbol
     ) {
-        return this.stockService.getOneStock(symbol);
+        StockInfo stockInfo = this.stockService.getOneStock(symbol);
+        return GetOneStockResponse.builder()
+                .stockInfo(stockInfo)
+                .build();
     }
 
     @GetMapping("/get-multiple-stocks")
@@ -47,7 +52,10 @@ public class StockController {
             @Valid
             List<@NotBlank @Pattern(regexp = ValidationPatterns.SYMBOL_REGEX, message = ValidationMessages.SYMBOL_INVALID_FORMAT) String> symbols
     ) {
-        return this.stockService.getMultipleStocks(symbols);
+        List<StockInfo> stockInfoList = this.stockService.getMultipleStocks(symbols);
+        return GetMultipleStocksResponse.builder()
+                .stocks(stockInfoList)
+                .build();
     }
 
     @GetMapping("/get-time-series")
@@ -60,6 +68,9 @@ public class StockController {
             @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
             TimeSeriesPeriods period
     ) {
-        return this.stockService.getTimeSeries(symbol, period);
+        List<OHLCInfo> ohlcInfoList = this.stockService.getOHLCInfo(symbol, period);
+        return GetTimeSeriesResponse.builder()
+                .ohlcData(ohlcInfoList)
+                .build();
     }
 }
