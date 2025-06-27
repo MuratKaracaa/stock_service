@@ -47,7 +47,7 @@ public class OrderService {
             IncomingStockOrder incomingStockOrder = IncomingStockOrder.builder()
                     .orderId(orderId)
                     .userId(order.getUserId())
-                    .orderSymbol(order.getSymbol())
+                    .symbol(order.getSymbol())
                     .price(order.getPrice())
                     .quantity(order.getQuantity())
                     .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
