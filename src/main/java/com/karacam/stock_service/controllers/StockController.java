@@ -10,7 +10,9 @@ import com.karacam.stock_service.models.OHLCInfo;
 import com.karacam.stock_service.models.StockInfo;
 import com.karacam.stock_service.services.StockService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,8 +35,7 @@ public class StockController {
     @GetMapping("/get-one-stock")
     public GetOneStockResponse getOneStock(
             @RequestParam
-            @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
-            @NotBlank(message = ValidationMessages.PARAMETER_NOT_EMPTY)
+            @Pattern(regexp = ValidationPatterns.SYMBOL_REGEX, message = ValidationMessages.SYMBOL_INVALID_FORMAT)
             String symbol
     ) {
         StockInfo stockInfo = this.stockService.getOneStock(symbol);
@@ -46,8 +47,6 @@ public class StockController {
     @GetMapping("/get-multiple-stocks")
     public GetMultipleStocksResponse getMultipleStocks(
             @RequestParam
-            @NotNull(message = ValidationMessages.SYMBOLS_REQUIRED)
-            @NotEmpty(message = ValidationMessages.PARAMETER_LIST_NOT_EMPTY)
             @Size(min = 1, max = 20, message = ValidationMessages.SYMBOLS_MAX_TWENTY)
             @Valid
             List<@NotBlank @Pattern(regexp = ValidationPatterns.SYMBOL_REGEX, message = ValidationMessages.SYMBOL_INVALID_FORMAT) String> symbols
@@ -61,11 +60,8 @@ public class StockController {
     @GetMapping("/get-time-series")
     public GetTimeSeriesResponse getTimeSeries(
             @RequestParam
-            @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
-            @NotBlank(message = ValidationMessages.PARAMETER_NOT_EMPTY)
             String symbol,
             @RequestParam
-            @NotNull(message = ValidationMessages.SYMBOL_REQUIRED)
             TimeSeriesPeriods period
     ) {
         List<OHLCInfo> ohlcInfoList = this.stockService.getOHLCInfo(symbol, period);

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "com.karacam.stock_service.gen";
+
+message AppExecutionReport {
+  string order_id = 1;
+  int32 volume = 2;
+  string timestamp = 3;
+  double execution_price = 4;
+}

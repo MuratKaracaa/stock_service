@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 @Builder
 public class GetOneStockResponse {
-    StockInfo stockInfo;
+    private StockInfo stockInfo;
 }

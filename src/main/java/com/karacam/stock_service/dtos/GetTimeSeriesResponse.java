@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 @Builder
 public class GetTimeSeriesResponse {
-    List<OHLCInfo> ohlcData;
+    private List<OHLCInfo> ohlcData;
 }
