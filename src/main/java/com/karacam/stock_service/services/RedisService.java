@@ -59,7 +59,10 @@ public class RedisService {
     public boolean checkAndSet(String setKey, String values) {
         Long insertedCount = setOperations.add(setKey, values);
         return insertedCount > 0;
+    }
 
+    public void deleteFromSet(String setKey, String value) {
+        setOperations.remove(setKey, value);
     }
 
     /**

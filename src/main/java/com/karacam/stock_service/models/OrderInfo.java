@@ -7,14 +7,12 @@ import com.karacam.stock_service.enums.OrderType;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.Instant;
 import java.util.List;
 
 @Data
 @Builder
 public class OrderInfo {
     private String orderId;
-    private int userId;
     private String symbol;
     private OrderSide side;
     private OrderType type;
@@ -23,6 +21,5 @@ public class OrderInfo {
     private double total;
     private OrderStatus status;
     private int fulfilledQuantity;
-    private Instant timestamp;
     private List<OrderExecution> executionList;
 }

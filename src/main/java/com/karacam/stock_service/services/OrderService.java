@@ -1,5 +1,6 @@
 package com.karacam.stock_service.services;
 
+import com.karacam.stock_service.constants.KafkaConstants;
 import com.karacam.stock_service.entities.IncomingStockOrder;
 import com.karacam.stock_service.entities.OutboxStockOrder;
 import com.karacam.stock_service.entities.types.OrderExecution;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,42 +47,48 @@ public class OrderService {
         orderSetKey = orderSetKeyPrefix.concat(TimeUtil.getToday());
     }
 
-    @KafkaListener(topics = "incoming_orders", groupId = "stock_service_incoming_order_consumer")
+    @KafkaListener(topics = KafkaConstants.incoming_order_topic, groupId = KafkaConstants.incoming_order_consumer_group_id, containerFactory = "configureProtobufMessageKafkaListenerContainerFactory")
     @Transactional
     public void listenToIncomingOrders(IncomingOrder.OrderMessage order) {
         String orderId = generateHashForIncomingOrder(order);
         Instant timeStamp = TimeUtil.protoTimestampToInstant(order.getTimestamp());
 
-        if (this.redisService.checkAndSet(orderSetKey, orderId)) {
-            IncomingStockOrder incomingStockOrder = IncomingStockOrder.builder()
-                    .orderId(orderId)
-                    .userId(order.getUserId())
-                    .symbol(order.getSymbol())
-                    .price(order.getPrice())
-                    .quantity(order.getQuantity())
-                    .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
-                    .side(order.getSide() == IncomingOrder.OrderSide.BUY ? OrderSide.BUY : OrderSide.SELL)
-                    .status(OrderStatus.NEW)
-                    .fulfilledQuantity(0)
-                    .timestamp(timeStamp)
-                    .build();
+        try {
+            if (this.redisService.checkAndSet(orderSetKey, orderId)) {
+                IncomingStockOrder incomingStockOrder = IncomingStockOrder.builder()
+                        .orderId(orderId)
+                        .userId(order.getUserId())
+                        .symbol(order.getSymbol())
+                        .price(order.getPrice())
+                        .quantity(order.getQuantity())
+                        .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
+                        .side(order.getSide() == IncomingOrder.OrderSide.BUY ? OrderSide.BUY : OrderSide.SELL)
+                        .status(OrderStatus.NEW)
+                        .fulfilledQuantity(0)
+                        .timestamp(timeStamp)
+                        .executionList(new ArrayList<>())
+                        .build();
 
-            OutboxStockOrder outboxStockOrder = OutboxStockOrder.builder()
-                    .orderId(orderId)
-                    .symbol(order.getSymbol())
-                    .price(order.getPrice())
-                    .quantity(order.getQuantity())
-                    .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
-                    .side(order.getSide() == IncomingOrder.OrderSide.BUY ? OrderSide.BUY : OrderSide.SELL)
-                    .timestamp(timeStamp)
-                    .build();
+                OutboxStockOrder outboxStockOrder = OutboxStockOrder.builder()
+                        .orderId(orderId)
+                        .symbol(order.getSymbol())
+                        .price(order.getPrice())
+                        .quantity(order.getQuantity())
+                        .type(order.getType() == IncomingOrder.OrderType.MARKET ? OrderType.MARKET : OrderType.LIMIT)
+                        .side(order.getSide() == IncomingOrder.OrderSide.BUY ? OrderSide.BUY : OrderSide.SELL)
+                        .timestamp(timeStamp)
+                        .build();
 
-            incomingStockOrderRepository.save(incomingStockOrder);
-            outboxStockOrderRepository.save(outboxStockOrder);
+                incomingStockOrderRepository.save(incomingStockOrder);
+                outboxStockOrderRepository.save(outboxStockOrder);
+            }
+
+        } catch (Exception exception) {
+            this.redisService.deleteFromSet(orderSetKey, orderId);
         }
     }
 
-    @KafkaListener(topics = "execution_reports", groupId = "stock_service_execution_report_consumer")
+    @KafkaListener(topics = KafkaConstants.execution_report_topic, groupId = KafkaConstants.execution_report_consumer_group_id, containerFactory = "configureProtobufMessageKafkaListenerContainerFactory")
     @Transactional
     public void listenToExecutionReports(AppExecutionReportOuterClass.AppExecutionReport appExecutionReport) {
         Optional<IncomingStockOrder> incomingStockOrderOptional = this.incomingStockOrderRepository.findByOrderId(appExecutionReport.getOrderId());
@@ -136,6 +144,7 @@ public class OrderService {
                 .symbol(incomingStockOrder.getSymbol())
                 .price(incomingStockOrder.getPrice())
                 .quantity(incomingStockOrder.getQuantity())
+                .fulfilledQuantity(incomingStockOrder.getFulfilledQuantity())
                 .side(incomingStockOrder.getSide())
                 .type(incomingStockOrder.getType())
                 .status(incomingStockOrder.getStatus())
@@ -163,8 +172,9 @@ public class OrderService {
     }
 
     private double getExecutedOrderTotal(IncomingStockOrder order) {
-        return order.getExecutionList().stream().mapToDouble(OrderExecution::getExecutionPrice).sum();
-
+        return order.getExecutionList().stream().mapToDouble(iteratedExecution -> {
+            return iteratedExecution.getExecutionPrice() * iteratedExecution.getVolume();
+        }).sum();
     }
 
     @Scheduled(cron = "0 0 3 * * *")

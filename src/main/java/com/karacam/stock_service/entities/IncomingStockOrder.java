@@ -57,7 +57,7 @@ public class IncomingStockOrder {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    @JdbcTypeCode(SqlTypes.JSON_ARRAY)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "execution_list", columnDefinition = "jsonb")
     private List<OrderExecution> executionList;
 
